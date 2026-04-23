@@ -1,8 +1,3 @@
-# KurtKPZ
-Just a script 
-(please rate my script i made it)
-
-
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
@@ -171,6 +166,34 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- Hitbox/Combat Loop
+task.spawn(function()
+    while task.wait(0.2) do
+        for _, v in pairs(Players:GetPlayers()) do
+            if v ~= LP and v.Character then
+                if HitboxEnabled then
+                    for _, partName in pairs({"Head", "HumanoidRootPart"}) do
+                        local p = v.Character:FindFirstChild(partName)
+                        if p then
+                            p.Size = Vector3.new(HitboxSizeValue, HitboxSizeValue, HitboxSizeValue)
+                            p.Transparency = 0.5
+                            p.Material = Enum.Material.ForceField
+                            p.CanCollide = false
+                        end
+                    end
+                end
+                if KillAuraEnabled and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                    local hrp = v.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp and (LP.Character.HumanoidRootPart.Position - hrp.Position).Magnitude < 15 then
+                        local tool = LP.Character:FindFirstChildOfClass("Tool")
+                        if tool then tool:Activate() end
+                    end
+                end
+            end
+        end
+    end
+end)
+
 --- [VISUALS & FPS] ---
 
 VisualTab:CreateButton({
@@ -197,13 +220,23 @@ VisualTab:CreateButton({
             local animateScript = character:WaitForChild("Animate")
             StopAnimations(character)
 
+            -- Animation IDs
             animateScript.idle.Animation1.AnimationId = "rbxassetid://122257458498464"
             animateScript.idle.Animation2.AnimationId = "rbxassetid://98173568987992"
+            if animateScript.idle:FindFirstChild("Animation3") then
+                animateScript.idle.Animation3.AnimationId = "rbxassetid://89262795687364"
+            else
+                local pose = Instance.new("Animation", animateScript.idle)
+                pose.Name = "Animation3"
+                pose.AnimationId = "rbxassetid://89262795687364"
+            end
             animateScript.walk.WalkAnim.AnimationId = "rbxassetid://122150855457006"
             animateScript.run.RunAnim.AnimationId = "rbxassetid://82598234841035"
             animateScript.jump.JumpAnim.AnimationId = "rbxassetid://75290611992385"
             animateScript.climb.ClimbAnim.AnimationId = "rbxassetid://88763136693023"
             animateScript.fall.FallAnim.AnimationId = "rbxassetid://18537367238"
+            animateScript.swim.Swim.AnimationId = "rbxassetid://133308483266208"
+            animateScript.swimidle.SwimIdle.AnimationId = "rbxassetid://109346520324160"
 
             humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
             Rayfield:Notify({Title = "Animations", Content = "Adidas Animations Applied!", Duration = 3})
@@ -212,6 +245,36 @@ VisualTab:CreateButton({
         if LP.Character then ApplyCustomAnimations(LP.Character) end
         LP.CharacterAdded:Connect(ApplyCustomAnimations)
     end,
+})
+
+VisualTab:CreateButton({
+   Name = "ULTRA FPS BOOST (Gray man / No Clothes)",
+   Callback = function()
+      for _, v in pairs(game:GetDescendants()) do
+         if v:IsA("Part") or v:IsA("MeshPart") then
+            v.Material = Enum.Material.SmoothPlastic
+            v.Color = Color3.fromRGB(163, 162, 165)
+         elseif v:IsA("Decal") or v:IsA("Texture") or v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Fire") or v:IsA("Smoke") then
+            v:Destroy()
+         end
+      end
+      local function Grayify(char)
+         task.wait(0.1)
+         for _, obj in pairs(char:GetDescendants()) do
+            if obj:IsA("Accessory") or obj:IsA("Shirt") or obj:IsA("Pants") or obj:IsA("Decal") or obj:IsA("ShirtGraphic") then
+               obj:Destroy()
+            elseif obj:IsA("BasePart") then
+               obj.Color = Color3.fromRGB(163, 162, 165)
+               obj.Material = Enum.Material.SmoothPlastic
+            end
+         end
+      end
+      for _, p in pairs(Players:GetPlayers()) do
+         if p.Character then Grayify(p.Character) end
+         p.CharacterAdded:Connect(Grayify)
+      end
+      Rayfield:Notify({Title = "FPS Boost", Content = "World and Players are now Optimized Gray", Duration = 3})
+   end,
 })
 
 VisualTab:CreateToggle({
@@ -228,21 +291,104 @@ VisualTab:CreateButton({
    end,
 })
 
+-- ESP Loop
+task.spawn(function()
+    while task.wait(0.5) do
+        for _, v in pairs(Players:GetPlayers()) do
+            if v ~= LP and v.Character then
+                local highlight = v.Character:FindFirstChild("KurtESP")
+                if ESPEnabled then
+                    if not highlight then
+                        highlight = Instance.new("Highlight")
+                        highlight.Name = "KurtESP"
+                        highlight.Parent = v.Character
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                    end
+                elseif highlight then highlight:Destroy() end
+            end
+        end
+    end
+end)
+
 --- [MISC & WORLD] ---
 
 MiscTab:CreateButton({
-   Name = "Touch to Fling",
+   Name = "Redz Hub",
    Callback = function()
-      loadstring(game:HttpGet("https://pastebin.com/raw/LgZwZ7ZB",true))()
-      Rayfield:Notify({Title = "Execution", Content = "Touch to Fling Activated!", Duration = 3})
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Scripts/refs/heads/main/main.luau"))()
+      Rayfield:Notify({Title = "Execution", Content = "Redz Hub Executed!", Duration = 3})
+   end,
+})
+
+MiscTab:CreateButton({
+   Name = "YARHM",
+   Callback = function()
+      local src = ""
+      local CoreGui = game:GetService("StarterGui")
+      pcall(function() 
+          src = game:HttpGet("https://yarhm.com", false)
+      end)
+      if src == "" then
+        CoreGui:SetCore("SendNotification", {
+            Title = "YARHM Outage";
+            Text = "YARHM Online is currently unavailable! Using YARHM Offline.";
+            Duration = 5;
+        })
+        src = game:HttpGet("https://raw.githubusercontent.com/Joystickplays/psychic-octo-invention/main/source/yarhm/1.20/yarhm.lua", false)
+      end
+      loadstring(src)()
+      Rayfield:Notify({Title = "Execution", Content = "YARHM Executed!", Duration = 3})
    end,
 })
 
 MiscTab:CreateButton({
    Name = "Fly GUI V3",
    Callback = function()
-      loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fly-V3-X-132770"))()
-      Rayfield:Notify({Title = "Execution", Content = "New Fly GUI V3 Loaded!", Duration = 3})
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/FallenTDS/Fly-GUI/refs/heads/main/Fly%20GUI"))()
+      Rayfield:Notify({Title = "Execution", Content = "Fly GUI V3 Executed!", Duration = 3})
+   end,
+})
+
+MiscTab:CreateButton({
+   Name = "Hitbox Extender V2 (Separate UI)",
+   Callback = function()
+        local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+        ScreenGui.Name = "GunGroundsGUI"
+        local Frame = Instance.new("Frame", ScreenGui)
+        Frame.Size = UDim2.new(0, 200, 0, 130)
+        Frame.Position = UDim2.new(0.05, 0, 0.3, 0)
+        Frame.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+        Frame.Draggable = true
+        Frame.Active = true
+
+        local Title = Instance.new("TextLabel", Frame)
+        Title.Text = "Hitbox Script"
+        Title.Size = UDim2.new(1, 0, 0, 25)
+        Title.TextColor3 = Color3.new(1, 1, 1)
+        Title.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+        Title.Font = Enum.Font.SourceSansBold
+
+        local AimbotToggle = Instance.new("TextButton", Frame)
+        AimbotToggle.Size = UDim2.new(1, -10, 0, 30)
+        AimbotToggle.Position = UDim2.new(0, 5, 0, 35)
+        AimbotToggle.Text = "Toggle Aimbot: OFF"
+        
+        local HitboxToggle = Instance.new("TextButton", Frame)
+        HitboxToggle.Size = UDim2.new(1, -10, 0, 30)
+        HitboxToggle.Position = UDim2.new(0, 5, 0, 70)
+        HitboxToggle.Text = "Toggle Hitbox: OFF"
+
+        local AimOn = false
+        AimbotToggle.MouseButton1Click:Connect(function()
+            AimOn = not AimOn
+            AimbotToggle.Text = "Toggle Aimbot: " .. (AimOn and "ON" or "OFF")
+        end)
+
+        HitboxToggle.MouseButton1Click:Connect(function()
+            HitboxToggle.Text = "Hitbox Toggled"
+        end)
+        
+        Rayfield:Notify({Title = "Execution", Content = "Hitbox V2 UI Loaded!", Duration = 3})
    end,
 })
 
